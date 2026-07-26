@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FileTextIcon, ImageIcon } from "lucide-react";
+import { Download, FileTextIcon, ImageIcon } from "lucide-react";
 import { ArtifactAttachmentPanelActions } from "@/components/chat/artifact-attachment-panel-actions";
 import {
   ArtifactShareMenuItem,
@@ -279,29 +279,53 @@ export function ArtifactAttachmentPreview({
     });
   }
 
+  function handleDownload(e: React.MouseEvent) {
+    e.stopPropagation();
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.download = artifact.filename;
+    link.rel = "noopener";
+    document.body.append(link);
+    link.click();
+    link.remove();
+  }
+
   return (
-    <button
-      type="button"
+    <div
       className={cn(
-        "relative inline-flex max-w-full shrink-0 items-center gap-2 rounded-lg border border-border bg-muted px-2 py-2 text-left transition-colors hover:bg-muted/70",
+        "relative inline-flex max-w-full shrink-0 items-stretch rounded-lg border border-border bg-muted text-left transition-colors",
         className,
       )}
-      onClick={openPanel}
     >
-      <div className="flex size-10 shrink-0 items-center justify-center rounded-md border border-border bg-background">
-        {isImage ? (
-          <ImageIcon className="size-4 text-muted-foreground" aria-hidden />
-        ) : (
-          <FileTextIcon className="size-4 text-muted-foreground" aria-hidden />
-        )}
-      </div>
-      <div className="min-w-0 max-w-[12rem]">
-        <p className="truncate text-xs font-medium text-foreground">{artifact.filename}</p>
-        <p className="text-[10px] text-muted-foreground">
-          {artifact.sizeBytes > 0 ? `${formatBytes(artifact.sizeBytes)} · ` : null}
-          Artifact
-        </p>
-      </div>
-    </button>
+      <button
+        type="button"
+        className="inline-flex flex-1 items-center gap-2 px-2 py-2 hover:bg-muted/70 rounded-l-lg"
+        onClick={openPanel}
+      >
+        <div className="flex size-10 shrink-0 items-center justify-center rounded-md border border-border bg-background">
+          {isImage ? (
+            <ImageIcon className="size-4 text-muted-foreground" aria-hidden />
+          ) : (
+            <FileTextIcon className="size-4 text-muted-foreground" aria-hidden />
+          )}
+        </div>
+        <div className="min-w-0 max-w-[12rem]">
+          <p className="truncate text-xs font-medium text-foreground">{artifact.filename}</p>
+          <p className="text-[10px] text-muted-foreground">
+            {artifact.sizeBytes > 0 ? `${formatBytes(artifact.sizeBytes)} · ` : null}
+            Artifact
+          </p>
+        </div>
+      </button>
+      <button
+        type="button"
+        aria-label={`Download ${artifact.filename}`}
+        title="Download"
+        className="inline-flex items-center justify-center px-2 text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground rounded-r-lg border-l border-border"
+        onClick={handleDownload}
+      >
+        <Download className="size-3.5" aria-hidden />
+      </button>
+    </div>
   );
 }
